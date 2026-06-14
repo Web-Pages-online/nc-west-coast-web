@@ -1,0 +1,150 @@
+{
+  "orders": [
+    {
+      "id": 1781298175794,
+      "folio": "NC2443",
+      "date": "2026-06-12T21:02:55.794Z",
+      "items": [
+        {
+          "nombre": "Warm & Cozy",
+          "precio": "280",
+          "imagen": "Cremas/img1.jpg",
+          "id": 1781298172215,
+          "cantidad": 1
+        }
+      ],
+      "total": 280,
+      "status": "Procesando",
+      "trackingNumber": ""
+    },
+    {
+      "id": 1781299291970,
+      "folio": "NC5092",
+      "date": "2026-06-12T21:21:31.970Z",
+      "items": [
+        {
+          "nombre": "Warm & Cozy",
+          "precio": "280",
+          "imagen": "Cremas/img1.jpg",
+          "id": 1781299143009,
+          "cantidad": 1
+        },
+        {
+          "nombre": "Vanilla & Dream",
+          "precio": "280",
+          "imagen": "Cremas/img3.jpg",
+          "id": 1781299278204,
+          "cantidad": 1,
+          "maxQty": 10
+        }
+      ],
+      "total": 560,
+      "status": "Procesando",
+      "trackingNumber": ""
+    },
+    {
+      "id": 1781300029440,
+      "folio": "NC2709",
+      "customerName": "Jesus Alonso",
+      "customerPhone": "9998024934",
+      "date": "2026-06-12T21:33:49.440Z",
+      "items": [
+        {
+          "nombre": "Warm & Cozy",
+          "precio": "280",
+          "imagen": "Cremas/img1.jpg",
+          "id": 1781300018711,
+          "cantidad": 1,
+          "maxQty": 8
+        },
+        {
+          "nombre": "Vanilla & Dream",
+          "precio": "280",
+          "imagen": "Cremas/img3.jpg",
+          "id": 1781300019396,
+          "cantidad": 1,
+          "maxQty": 9
+        }
+      ],
+      "total": 560,
+      "status": "Procesando",
+      "trackingNumber": ""
+    },
+    {
+      "id": 1781300631703,
+      "folio": "NC6379",
+      "customerName": "dwadadwad",
+      "customerPhone": "3575637534",
+      "date": "2026-06-12T21:43:51.703Z",
+      "items": [
+        {
+          "nombre": "Fresh & Clean",
+          "precio": "280",
+          "imagen": "Cremas/img7.jpg",
+          "id": 1781300624231,
+          "cantidad": 1,
+          "maxQty": 10
+        },
+        {
+          "nombre": "COCONUT CREAM",
+          "precio": "280",
+          "imagen": "Cremas/img8.jpg",
+          "id": 1781300627598,
+          "cantidad": 1,
+          "maxQty": 10
+        }
+      ],
+      "total": 560,
+      "status": "Procesando",
+      "trackingNumber": ""
+    },
+    {
+      "id": 1781300943936,
+      "folio": "NC4413",
+      "customerName": "awdawdawd",
+      "customerPhone": "4545",
+      "date": "2026-06-12T21:49:03.936Z",
+      "items": [
+        {
+          "nombre": "Apple Crisp",
+          "precio": "280",
+          "imagen": "Cremas/img6.jpg",
+          "id": 1781300940540,
+          "cantidad": 1,
+          "maxQty": 10
+        },
+        {
+          "nombre": "Pack Gloss Victoria's Secret",
+          "precio": "1300",
+          "imagen": "Duos/p1.jpg",
+          "id": 1781300940999,
+          "cantidad": 1,
+          "maxQty": 10
+        }
+      ],
+      "total": 1580,
+      "status": "Procesando",
+      "trackingNumber": ""
+    },
+    {
+      "id": 1781399931762,
+      "folio": "NC5648",
+      "customerName": "wadawdwad",
+      "customerPhone": "345345",
+      "date": "2026-06-14T01:18:51.762Z",
+      "items": [
+        {
+          "nombre": "Vanilla & Dream",
+          "precio": "280",
+          "imagen": "Cremas/img3.jpg",
+          "id": 1781399927443,
+          "cantidad": 1,
+          "maxQty": 8
+        }
+      ],
+      "total": 280,
+      "status": "Procesando",
+      "trackingNumber": ""
+    }
+  ]
+}

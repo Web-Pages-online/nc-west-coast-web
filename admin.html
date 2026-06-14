@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Inventario | NC West Coast</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=4">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .admin-page .module { display: none !important; animation: fadeInAdmin 0.3s ease; }
+        .admin-page .module.active { display: block !important; }
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
+        .order-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+        .order-card-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 15px; }
+        .folio-badge { background: #1a1a1a; color: white; padding: 5px 10px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; display: inline-block; margin-bottom: 5px; }
+        .order-total { font-size: 1.2rem; font-weight: 700; color: #bfa37e; }
+        .order-card-body { flex-grow: 1; margin-bottom: 15px; }
+        .whatsapp-link { color: #25D366; text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+        .view-order-btn { width: 100%; background: #f8f9fa; color: #2c3e50; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .view-order-btn:hover { background: #bfa37e; color: white; }
+    </style>
+</head>
+<body class="admin-page">
+
+    <div class="admin-header">
+        <h1><i class="fa-solid fa-box" style="color: var(--gold-accent);"></i> Panel de Inventario NC West Coast</h1>
+        <a href="shop.html" style="color: var(--gold-accent); text-decoration: none; font-weight: bold;">Ver Tienda</a>
+    </div>
+
+    <div class="admin-tabs">
+        <button class="tab-btn active" onclick="switchTab('inventario')" id="btn-inventario">Inventario</button>
+        <button class="tab-btn" onclick="switchTab('pedidos')" id="btn-pedidos">Pedidos</button>
+        <button class="tab-btn" onclick="switchTab('envios')" id="btn-envios">Envíos (Rastreo)</button>
+    </div>
+
+    <!-- MODULO: INVENTARIO -->
+    <div id="module-inventario" class="module active">
+        <div class="dashboard-grid">
+        
+        <!-- Panel Izquierdo: Formularios -->
+        <div>
+            <!-- FORMULARIO DE PRODUCTO (ALTA / EDICIÓN) -->
+            <div class="card" style="margin-bottom: 20px;">
+                <h2 id="formTitle">Dar de Alta Producto</h2>
+                <form id="productForm">
+                    <div class="form-group">
+                        <label>Nombre del Producto</label>
+                        <input type="text" id="addName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Marca (ej. eos, victoria-secret)</label>
+                        <input type="text" id="addBrand" list="brandList" autocomplete="off" required>
+                        <datalist id="brandList"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría (ej. cremas, mist)</label>
+                        <input type="text" id="addCategory" list="categoryList" autocomplete="off" required>
+                        <datalist id="categoryList"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>Imagen del Producto</label>
+                        <div id="dropZone" style="border: 2px dashed var(--gold-accent); padding: 20px; text-align: center; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; background: #fafbfc; position: relative;">
+                            <div id="dropZoneText">
+                                <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2rem; color: var(--gold-accent); margin-bottom: 10px;"></i>
+                                <p style="margin:0; font-size:0.9rem; color:var(--text-muted);">Arrastra una imagen aquí o haz clic</p>
+                            </div>
+                            <img id="imagePreview" style="display:none; max-width: 100%; max-height: 150px; border-radius: 8px; margin: 0 auto;">
+                            <input type="file" id="fileInput" accept="image/*" style="display:none;">
+                            <input type="hidden" id="addImage" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Precio ($)</label>
+                        <input type="number" id="addPrice" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Cantidad Inicial</label>
+                        <input type="number" id="addQty" value="10" required>
+                    </div>
+                    <button type="submit" id="submitBtn">Agregar Producto</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Panel Derecho: Lista de Productos -->
+        <div class="card" style="overflow-x: auto;">
+            <h2>Inventario Actual (<span id="totalProducts">0</span> productos)</h2>
+            <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                <div style="flex: 2; position: relative; min-width: 200px;">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar por nombre o marca..." style="padding: 12px 15px 12px 40px; width: 100%; border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Outfit', sans-serif; font-size: 1rem; box-sizing: border-box; background: #fdfdfd;">
+                </div>
+                <select id="filterBrand" style="flex: 1; min-width: 150px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Outfit', sans-serif; outline: none; background: #fdfdfd; cursor: pointer;">
+                    <option value="">Todas las Marcas</option>
+                </select>
+                <select id="filterCategory" style="flex: 1; min-width: 150px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Outfit', sans-serif; outline: none; background: #fdfdfd; cursor: pointer;">
+                    <option value="">Todas las Categorías</option>
+                </select>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Img</th>
+                            <th>Nombre</th>
+                            <th>Marca</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTable">
+                        <!-- Filas dinámicas -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div> <!-- FIN dashboard-grid -->
+    </div> <!-- FIN MODULO INVENTARIO -->
+
+    <!-- MODULO: PEDIDOS -->
+    <div id="module-pedidos" class="module">
+        <div class="card" style="overflow-x: auto;">
+            <h2>Detalles de Pedidos</h2>
+            <div id="pedidosCardsContainer" class="cards-grid">
+                <!-- Tarjetas dinámicas -->
+            </div>
+        </div>
+    </div> <!-- FIN MODULO PEDIDOS -->
+
+    <!-- MODULO: ENVIOS -->
+    <div id="module-envios" class="module">
+        <div class="card" style="overflow-x: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                <h2 style="border: none; padding: 0; margin: 0;">Logística y Rastreo</h2>
+                <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                    <select id="filterMonth" onchange="filterOrders()" style="padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; font-family: 'Outfit'; min-width: 150px;">
+                        <option value="">Todos los Meses</option>
+                    </select>
+                    <select id="filterDay" onchange="filterOrders()" style="padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; font-family: 'Outfit'; min-width: 150px;">
+                        <option value="">Todos los Días</option>
+                    </select>
+                    <button onclick="bulkMarkAsShipped()" style="background: #2c3e50; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-family: 'Outfit'; width: auto;"><i class="fa-solid fa-truck-fast"></i> Marcar Enviados</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAllOrders" onclick="toggleSelectAllOrders()" style="transform: scale(1.2); cursor: pointer;"></th>
+                            <th>Folio</th>
+                            <th>Paquetería</th>
+                            <th>No. Guía</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="enviosTable">
+                        <!-- Filas dinámicas -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div> <!-- FIN MODULO ENVIOS -->
+
+    <!-- MODAL DE DETALLES DE PEDIDO -->
+    <div id="orderDetailModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close-modal" onclick="closeOrderModal()">&times;</span>
+            <h2 id="orderDetailTitle" style="margin-top:0; margin-bottom: 20px;">Contenido del Pedido</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio Unit.</th>
+                            <th>Cant.</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderDetailItems">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDICIÓN -->
+    <div id="editModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeEditModal()">&times;</span>
+            <h2 style="margin-top:0; margin-bottom: 20px;">Editar Producto</h2>
+            <form id="editProductForm">
+                <input type="hidden" id="editModalId">
+                <div class="form-group">
+                    <label>Nombre del Producto</label>
+                    <input type="text" id="editName" required>
+                </div>
+                <div class="form-group" style="display:flex; gap: 15px;">
+                    <div style="flex:1;">
+                        <label>Marca</label>
+                        <input type="text" id="editBrand" list="brandList" autocomplete="off" required>
+                    </div>
+                    <div style="flex:1;">
+                        <label>Categoría</label>
+                        <input type="text" id="editCategory" list="categoryList" autocomplete="off" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Imagen del Producto</label>
+                    <div id="editDropZone" style="border: 2px dashed var(--gold-accent); padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; background: #fafbfc; position: relative;">
+                        <div id="editDropZoneText">
+                            <i class="fa-solid fa-cloud-arrow-up" style="font-size: 1.5rem; color: var(--gold-accent); margin-bottom: 5px;"></i>
+                            <p style="margin:0; font-size:0.8rem; color:var(--text-muted);">Arrastra o haz clic para cambiar foto</p>
+                        </div>
+                        <img id="editImagePreview" style="display:none; max-width: 100%; max-height: 120px; border-radius: 8px; margin: 0 auto;">
+                        <input type="file" id="editFileInput" accept="image/*" style="display:none;">
+                        <input type="hidden" id="editImage" required>
+                    </div>
+                </div>
+                <div class="form-group" style="display:flex; gap: 15px;">
+                    <div style="flex:1;">
+                        <label>Precio ($)</label>
+                        <input type="number" id="editPrice" required>
+                    </div>
+                    <div style="flex:1;">
+                        <label>Stock</label>
+                        <input type="number" id="editQty" required>
+                    </div>
+                </div>
+                <button type="submit" style="background: var(--gold-accent); margin-top:10px;">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin.js?v=5"></script>
+</body>
+</html>

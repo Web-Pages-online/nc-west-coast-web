@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rastreo de Pedido | NC West Coast</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="NC.ico">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .track-section {
+            padding: 80px 5%;
+            min-height: 60vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .track-card {
+            background: var(--card-bg, #fff);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            border: 1px solid var(--border-color, #eee);
+        }
+        .track-card h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--text-color, #333);
+        }
+        .track-card p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+        .track-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 20px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .track-input:focus {
+            border-color: var(--gold-accent, #bfa37e);
+        }
+        .track-btn {
+            background: var(--dark-bg, #1a1a1a);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            width: 100%;
+            font-size: 1.1rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .track-btn:hover {
+            background: var(--gold-accent, #bfa37e);
+            transform: translateY(-2px);
+        }
+        #trackResult {
+            margin-top: 30px;
+            display: none;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            text-align: left;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: white;
+        }
+        .status-Procesando { background: #f39c12; }
+        .status-Enviado { background: #3498db; }
+        .status-Entregado { background: #2ecc71; }
+        
+        /* Timeline Styles */
+        .timeline {
+            position: relative;
+            max-width: 400px;
+            margin: 20px auto;
+            padding-left: 20px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e0e0e0;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 2px #e0e0e0;
+            z-index: 1;
+        }
+        .timeline-item.completed::before {
+            background: var(--gold-accent, #bfa37e);
+            box-shadow: 0 0 0 2px var(--gold-accent, #bfa37e);
+        }
+        .timeline-item.active::before {
+            background: #fff;
+            border: 3px solid var(--gold-accent, #bfa37e);
+            box-shadow: 0 0 0 2px var(--gold-accent, #bfa37e), 0 0 10px rgba(191,163,126,0.5);
+        }
+        .timeline-content {
+            padding-left: 15px;
+        }
+        .timeline-title {
+            font-weight: 600;
+            color: var(--text-color, #333);
+            margin: 0 0 5px 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .timeline-date {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        .timeline-desc {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <ul class="nav-menu">
+            <li><a href="index.html" class="nav-link">Inicio</a></li>
+            <li><a href="shop.html" class="nav-link">Tienda</a></li>
+            <li><a href="encargos.html" class="nav-link">Encarga</a></li>
+            <li><a href="rastreo.html" class="nav-link active">Rastreo</a></li>
+        </ul>
+
+        <a href="index.html" class="logo-center">
+            <img src="bolso.png" alt="NC Logo" class="logo-img">
+        </a>
+
+        <div class="header-actions">
+            <!-- Espacio para balanceo -->
+            <div style="width: 24px;"></div>
+        </div>
+    </header>
+
+    <section class="track-section">
+        <div class="track-card">
+            <h2>Rastrea tu Pedido</h2>
+            <p>Ingresa el Número de Folio que viene en tu ticket PDF para conocer el estatus de tu envío.</p>
+            
+            <input type="text" id="folioInput" class="track-input" placeholder="Ej. NC4582" autocomplete="off">
+            <button class="track-btn" onclick="buscarPedido()">Buscar Pedido</button>
+
+            <div id="trackResult">
+                <!-- Resultados se inyectan aquí -->
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2025 NC West Coast. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        async function buscarPedido() {
+            const folio = document.getElementById('folioInput').value.trim();
+            const resultDiv = document.getElementById('trackResult');
+            
+            if (!folio) {
+                alert('Por favor ingresa un número de folio válido.');
+                return;
+            }
+
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p style="text-align:center;">Buscando...</p>';
+
+            try {
+                const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3000' : '';
+                const response = await fetch(`${API_BASE}/api/track/realtime/${folio}`);
+                if (!response.ok) {
+                    resultDiv.innerHTML = '<p style="color:red; text-align:center;">No se encontró ningún pedido con ese folio. Verifica que esté bien escrito (Ej: NC1234).</p>';
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                let timelineHtml = '<div class="timeline">';
+                data.events.forEach((ev, index) => {
+                    let itemClass = ev.completed ? 'completed' : (index === data.events.length - 1 ? 'active' : '');
+                    timelineHtml += `
+                        <div class="timeline-item ${itemClass}">
+                            <div class="timeline-content">
+                                <h4 class="timeline-title">${ev.status}</h4>
+                                <div class="timeline-date">${ev.date}</div>
+                                <p class="timeline-desc">${ev.description}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+                timelineHtml += '</div>';
+
+                resultDiv.innerHTML = `
+                    <h3 style="margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px; text-align: center; font-family: 'Playfair Display', serif;">Estado de tu Envío</h3>
+                    <p style="text-align:center;"><strong>Folio:</strong> ${data.folio} &nbsp; | &nbsp; <strong>Paquetería:</strong> ${data.carrier || 'Asignando...'}</p>
+                    ${timelineHtml}
+                    <div style="text-align:center; margin-top:20px; font-size: 0.85rem; color:#888;">
+                        * Información en tiempo real provista por la paquetería.
+                    </div>
+                `;
+            } catch (err) {
+                console.error(err);
+                resultDiv.innerHTML = '<p style="color:red; text-align:center;">Error de conexión. Intenta nuevamente más tarde.</p>';
+            }
+        }
+    </script>
+</body>
+</html>

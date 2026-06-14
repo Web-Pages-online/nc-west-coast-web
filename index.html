@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inicio | NC West Coast</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="icon" type="image/x-icon" href="NC.ico" />
+    <link rel="stylesheet" href="style.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="script.js?v=3" defer></script>
+  </head>
+  <body>
+    <div id="preloader">
+      <div class="loader-content">
+        <img src="NC.jpg" alt="Cargando..." class="loader-logo" />
+        <div class="loader-line"></div>
+      </div>
+    </div>
+
+
+
+    <header>
+      <ul class="nav-menu">
+        <li>
+          <a href="index.html" class="nav-link active" onclick="closeMenu()"
+            >Inicio</a
+          >
+        </li>
+        <li>
+          <a href="shop.html" class="nav-link" onclick="closeMenu()">Tienda</a>
+        </li>
+        <li>
+          <a href="encargos.html" class="nav-link" onclick="closeMenu()"
+            >Encarga</a
+          >
+        </li>
+      </ul>
+
+      <a href="index.html" class="logo-center">
+        <img src="bolso.png" alt="NC Logo" class="logo-img" />
+      </a>
+
+      <div class="header-actions">
+        <button class="nav-cart-btn" onclick="toggleCartModal()" title="Ver Canasta">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span id="cart-count" class="nav-cart-count" style="display: none;">0</span>
+        </button>
+        <button
+          class="theme-toggle-btn"
+          id="theme-toggle"
+          title="Modo Oscuro/Claro"
+        >
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <div class="hamburger">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </div>
+      </div>
+    </header>
+
+    <div class="marquee-container">
+      <div class="marquee-content">
+        TODO LO QUE PODEMOS CONSEGUIR PARA TI • WEST COAST VIBE • COMPRA SEGURA
+        • SOLO CON NOSOTROS • TODO LO QUE PODEMOS CONSEGUIR PARA TI • WEST COAST
+        VIBE • COMPRA SEGURA • SOLO CON NOSOTROS •
+      </div>
+    </div>
+
+    <section class="hero">
+      <div class="carousel">
+        <div
+          class="slide active"
+          style="background-image: url(&quot;Drop1.jpg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Bags/b4.jpg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Bags/b5.jpg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Geles/img1.jpg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Geles/img2.jpg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Mist/img1.jpg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Mist/img2.jpg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Mist/vs1.jpg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Mist/vs2.jpg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Cremas/img1.jpg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Cremas/img2.jpg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Velas/img1.jpg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Velas/img2.jpg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Cremas/vs1.jpg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Cremas/vs2.jpg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Bags/b18.jpeg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Bags/b19.jpeg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Cremas/b1.jpeg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Cremas/b2.jpeg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Duos/p1.jpg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Duos/d2.jpg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Duos/d1.jpg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Jabones/jb1.jpeg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Jabones/jb2.jpeg&quot;)"
+        ></div>
+        <div
+          class="slide"
+          style="background-image: url(&quot;Drop2.jpg&quot;)"
+        ></div>
+        <div class="overlay"></div>
+      </div>
+
+      <button class="carousel-btn prev">❮</button>
+      <button class="carousel-btn next">❯</button>
+    </section>
+
+    <div class="marquee-container">
+      <div class="marquee-content">
+        TODO LO QUE PODEMOS CONSEGUIR PARA TI • WEST COAST VIBE • COMPRA SEGURA
+        • SOLO CON NOSOTROS • TODO LO QUE PODEMOS CONSEGUIR PARA TI • WEST COAST
+        VIBE • COMPRA SEGURA • SOLO CON NOSOTROS •
+      </div>
+    </div>
+
+    <section id="about" class="section-padding">
+      <div class="about-container">
+        <div class="about-text reveal">
+          <h2>Cruzando Fronteras</h2>
+          <div
+            style="
+              width: 60px;
+              height: 3px;
+              background: var(--gold-accent);
+              margin: 15px 0;
+            "
+          ></div>
+          <p>
+            <strong>Desde 2024</strong>, NC West Coast se ha dedicado a traer la
+            auténtica estética urbana de las calles americanas directamente a
+            México.
+          </p>
+          <p style="margin-top: 15px">
+            Seleccionamos lo mejor de la vibra West Coast. Relajado, audaz e
+            icónico.
+          </p>
+          <br />
+          <p style="color: var(--gold-accent); font-weight: 600">
+            "El estilo americano, ahora en Mex."
+          </p>
+        </div>
+        <div class="about-image reveal">
+          <img src="collage.jpg" alt="Estilo Urbano" />
+        </div>
+      </div>
+    </section>
+
+    <section class="custom-order-banner">
+      <div class="custom-order-content">
+        <h2>¿No encuentras lo que buscas?</h2>
+        <p>
+          Si necesitas un modelo específico de tenis, un reloj exclusivo o un
+          bolso que no ves aquí, <strong>¡Nosotros te lo conseguimos!</strong>
+        </p>
+        <p class="sub-text">
+          Trabajamos bajo pedido con marcas originales. Mándanos la foto y te
+          damos precio.
+        </p>
+        <a href="https://m.me/859771300559984" target="_blank">
+          <button class="hero-btn order-btn">Cotizar Ahora</button>
+        </a>
+      </div>
+    </section>
+
+    <footer id="contact">
+      <div class="social-links">
+        <a
+          href="https://www.facebook.com/profile.php?id=61585333114925"
+          target="_blank"
+          class="social-link"
+          >Facebook</a
+        >
+        <a
+          href="https://www.instagram.com/nc_westcoast"
+          target="_blank"
+          class="social-link"
+          >Instagram</a
+        >
+      </div>
+      <br />
+      <p>© 2025 NC West Coast. Todos los derechos reservados.</p>
+    </footer>
+
+    <div id="modalCarrito" class="modal-pedido-overlay">
+      <div class="modal-pedido-box" style="background-color: #f9f7f2">
+        <span class="cerrar-x" onclick="toggleCartModal()">×</span>
+        <h2
+          style="
+            font-family: &quot;Playfair Display&quot;, serif;
+            text-align: center;
+          "
+        >
+          Mi Carrito
+        </h2>
+        <div
+          id="cart-items-container"
+          style="
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+            border-bottom: 1px solid #ddd;
+            border-top: 1px solid #ddd;
+            padding: 10px 0;
+          "
+        >
+          <p style="text-align: center; color: #999">Tu carrito está vacío</p>
+        </div>
+
+        <div id="checkout-form" style="margin-bottom: 20px; text-align: left;">
+            <p style="margin-bottom: 10px; font-weight: 600; font-size: 0.95rem;">Tus Datos (Para tu Envío)</p>
+            <input type="text" id="customerName" placeholder="Nombre Completo" required style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; font-family: 'Montserrat', sans-serif;">
+            <input type="tel" id="customerPhone" placeholder="Tu número de teléfono (WhatsApp)" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-family: 'Montserrat', sans-serif;">
+        </div>
+        <div style="padding: 10px 0; text-align: right">
+          <p style="font-weight: bold; font-size: 1.1rem">
+            Total Estimado:
+            <span id="cart-total" style="color: var(--gold-accent)">$0.00</span>
+          </p>
+        </div>
+        <button class="btn-modal btn-verde" onclick="generarTicketPDF()">
+          <i class="fa-solid fa-file-pdf"></i> GENERAR TICKET PDF
+        </button>
+      </div>
+    </div>
+
+    <div id="imageModal" class="image-modal">
+      <span class="close-modal">×</span>
+      <img class="modal-content" id="img01" />
+    </div>
+  </body>
+</html>
