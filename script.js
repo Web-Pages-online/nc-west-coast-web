@@ -245,6 +245,11 @@ function actualizarInterfazCarrito() {
     const countLabel = document.getElementById('cart-count');
     const totalLabel = document.getElementById('cart-total');
     
+    // Elementos adicionales a ocultar
+    const checkoutForm = document.getElementById('checkout-form');
+    const checkoutBtn = document.querySelector('.btn-modal[onclick="generarTicketPDF()"]');
+    const totalContainer = totalLabel ? totalLabel.parentElement.parentElement : null;
+
     if(!container) return;
 
     if (carrito.length === 0) {
@@ -254,8 +259,17 @@ function actualizarInterfazCarrito() {
             countLabel.style.display = 'none';
         }
         if(totalLabel) totalLabel.innerText = "$0.00";
+        
+        if(checkoutForm) checkoutForm.style.display = 'none';
+        if(checkoutBtn) checkoutBtn.style.display = 'none';
+        if(totalContainer) totalContainer.style.display = 'none';
+        
         return;
     }
+
+    if(checkoutForm) checkoutForm.style.display = 'block';
+    if(checkoutBtn) checkoutBtn.style.display = 'inline-block';
+    if(totalContainer) totalContainer.style.display = 'block';
 
     container.innerHTML = "";
     let totalItems = 0;
