@@ -187,6 +187,43 @@ app.post('/api/checkout', (req, res) => {
     res.json({ success: true, folio: folio, order: newOrder });
 });
 
+// POST custom order (Encargo personalizado con imagen)
+app.post('/api/custom-order', (req, res) => {
+    const { customerName, customerPhone, marca, modelo, talla, sistema, notas, imagePath } = req.body;
+    
+    if (!customerName || !marca || !modelo) {
+        return res.status(400).json({ error: "Datos incompletos" });
+    }
+
+    const ordersData = readOrders();
+    const folio = "NC" + Math.floor(1000 + Math.random() * 9000);
+    
+    const newOrder = {
+        id: Date.now(),
+        folio: folio,
+        type: "Encargo Personalizado",
+        customerName: customerName,
+        customerPhone: customerPhone || 'Sin Teléfono',
+        date: new Date().toISOString(),
+        items: [{
+            nombre: `${marca} - ${modelo}`,
+            cantidad: 1,
+            precio: "A cotizar",
+            imagen: imagePath || "bolso.png",
+            talla: `${talla} (${sistema})`,
+            notas: notas
+        }],
+        total: "A cotizar",
+        status: 'Procesando',
+        trackingNumber: ''
+    };
+
+    ordersData.orders.push(newOrder);
+    writeOrders(ordersData);
+
+    res.json({ success: true, folio: folio, order: newOrder });
+});
+
 // GET all orders (Admin)
 app.get('/api/orders', (req, res) => {
     const ordersData = readOrders();

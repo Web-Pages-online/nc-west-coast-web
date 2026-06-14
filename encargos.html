@@ -158,6 +158,39 @@
                 grid-template-columns: repeat(4, 1fr);
             }
         }
+        
+        /* Drag and Drop Zone */
+        .drop-zone {
+            width: 100%;
+            height: 120px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            background-color: #fafbfc;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .drop-zone:hover {
+            border-color: var(--gold-accent);
+            background-color: #f4f6f8;
+        }
+        .drop-zone img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+        .drop-zone-text {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -431,7 +464,16 @@
                     <label>Link o Notas adicionales</label>
                     <textarea id="pNotas" rows="2" placeholder="Pega el link o el color..."></textarea>
                 </div>
-                <button class="btn-modal btn-negro" onclick="generarTicketVisual()">SIGUIENTE: GENERAR TICKET</button>
+                <div class="form-group">
+                    <label>Imagen del Producto (Opcional)</label>
+                    <div id="dropZone" class="drop-zone">
+                        <span class="drop-zone-text" id="dropZoneText">Arrastra una imagen o haz clic aquí</span>
+                        <img id="imagePreview" src="">
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    <input type="hidden" id="pImagenUrl" value="">
+                </div>
+                <button class="btn-modal btn-negro" id="btnSiguiente" onclick="generarTicketVisual()">SIGUIENTE: GENERAR TICKET</button>
             </div>
         </div>
     </div>
@@ -496,7 +538,7 @@
             document.getElementById('modalTicketFinal').style.display = 'none';
         }
 
-        function generarTicketVisual() {
+        async function generarTicketVisual() {
             const nom = document.getElementById('pNombre').value;
             const tel = document.getElementById('pTelefono').value;
             const mar = document.getElementById('pMarca').value;
@@ -504,28 +546,60 @@
             const tal = document.getElementById('pTalla').value;
             const sis = document.getElementById('pSistema').value;
             const not = document.getElementById('pNotas').value || "Ninguna";
+            const imgUrl = document.getElementById('pImagenUrl').value;
             const fecha = new Date().toLocaleDateString();
-            const folio = Math.floor(1000 + Math.random() * 9000);
 
             if(!nom || !mar || !mod || !tel || !tal) {
                 alert("Por favor completa los campos obligatorios");
                 return;
             }
 
-            document.getElementById('ticket-data').innerHTML = `
-                <div class="ticket-item"><span>FOLIO:</span><span>#${folio}</span></div>
-                <div class="ticket-item"><span>CLIENTE:</span><span>${nom.toUpperCase()}</span></div>
-                <div class="ticket-item"><span>TELÉFONO:</span><span>${tel}</span></div>
-                <div class="ticket-item"><span>MARCA:</span><span>${mar}</span></div>
-                <div class="ticket-item"><span>MODELO:</span><span>${mod}</span></div>
-                <div class="ticket-item"><span>TALLA:</span><span>${tal} (${sis})</span></div>
-            `;
+            const btnSiguiente = document.getElementById('btnSiguiente');
+            btnSiguiente.innerText = "PROCESANDO...";
+            btnSiguiente.disabled = true;
 
-            const baseURL = window.location.href.split('?')[0];
-            enlaceTicket = `${baseURL}?folio=${folio}&nom=${encodeURIComponent(nom)}&tel=${encodeURIComponent(tel)}&mar=${encodeURIComponent(mar)}&mod=${encodeURIComponent(mod)}&tal=${encodeURIComponent(tal)}&sis=${encodeURIComponent(sis)}&fecha=${encodeURIComponent(fecha)}`;
+            try {
+                const response = await fetch('/api/custom-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        customerName: nom,
+                        customerPhone: tel,
+                        marca: mar,
+                        modelo: mod,
+                        talla: tal,
+                        sistema: sis,
+                        notas: not,
+                        imagePath: imgUrl
+                    })
+                });
 
-            document.getElementById('modalFormEncargo').style.display = 'none';
-            document.getElementById('modalTicketFinal').style.display = 'flex';
+                const data = await response.json();
+                
+                if (data.success) {
+                    const folio = data.folio;
+                    document.getElementById('ticket-data').innerHTML = `
+                        <div class="ticket-item"><span>FOLIO:</span><span>#${folio}</span></div>
+                        <div class="ticket-item"><span>CLIENTE:</span><span>${nom.toUpperCase()}</span></div>
+                        <div class="ticket-item"><span>TELÉFONO:</span><span>${tel}</span></div>
+                        <div class="ticket-item"><span>MARCA:</span><span>${mar}</span></div>
+                        <div class="ticket-item"><span>MODELO:</span><span>${mod}</span></div>
+                        <div class="ticket-item"><span>TALLA:</span><span>${tal} (${sis})</span></div>
+                        ${imgUrl ? `<div style="text-align:center; margin-top:10px;"><img src="${imgUrl}" style="width:80px; border-radius:5px;"></div>` : ''}
+                    `;
+
+                    document.getElementById('modalFormEncargo').style.display = 'none';
+                    document.getElementById('modalTicketFinal').style.display = 'flex';
+                } else {
+                    alert("Hubo un error al registrar el pedido.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error de conexión al enviar el pedido.");
+            } finally {
+                btnSiguiente.innerText = "SIGUIENTE: GENERAR TICKET";
+                btnSiguiente.disabled = false;
+            }
         }
 
         // Nueva función Messenger: Texto formateado para evitar bloqueos de FB
@@ -561,6 +635,86 @@
                     btn.style.backgroundColor = "#27ae60";
                 }, 1000);
             });
+        }
+
+        // --- Lógica Drag & Drop para Imágenes en Encargos ---
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const dropZoneText = document.getElementById('dropZoneText');
+        const pImagenUrl = document.getElementById('pImagenUrl');
+
+        if (dropZone) {
+            dropZone.addEventListener('click', () => fileInput.click());
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#1a1a1a';
+                dropZone.style.background = '#eef2f5';
+            });
+
+            dropZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#ddd';
+                dropZone.style.background = '#fafbfc';
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#ddd';
+                dropZone.style.background = '#fafbfc';
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    handleFileUpload(e.dataTransfer.files[0]);
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                    handleFileUpload(e.target.files[0]);
+                }
+            });
+        }
+
+        async function handleFileUpload(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Por favor, sube solo imágenes.');
+                return;
+            }
+            
+            // Vista previa inmediata
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+                dropZoneText.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+
+            dropZoneText.innerText = "Subiendo...";
+            dropZoneText.style.display = 'block';
+
+            // Subir al servidor
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    pImagenUrl.value = data.imagePath;
+                    dropZoneText.style.display = 'none';
+                } else {
+                    alert("Error al subir la imagen");
+                    dropZoneText.innerText = "Error, intenta de nuevo";
+                }
+            } catch (err) {
+                console.error("Error subiendo imagen:", err);
+                alert("Error al subir la imagen");
+                dropZoneText.innerText = "Error, intenta de nuevo";
+            }
         }
     </script>
 

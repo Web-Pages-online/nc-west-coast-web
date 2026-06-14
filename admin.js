@@ -501,10 +501,11 @@ function renderPedidosCards(orders) {
             <div class="order-card-header">
                 <div>
                     <span class="folio-badge"><i class="fa-solid fa-receipt"></i> ${o.folio}</span>
+                    ${o.type === 'Encargo Personalizado' ? '<span style="background: var(--gold-accent); color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.7em; margin-left: 10px;">ENCARGO</span>' : ''}
                     <p class="order-date">${d}</p>
                 </div>
                 <div class="order-total">
-                    $${o.total.toLocaleString()}
+                    ${isNaN(parseFloat(o.total)) ? o.total : '$' + o.total.toLocaleString()}
                 </div>
             </div>
             <div class="order-card-body">
@@ -570,7 +571,8 @@ function openOrderModal(id) {
     tbody.innerHTML = '';
     
     order.items.forEach(item => {
-        const subtotal = item.precio * item.cantidad;
+        const isNotNumeric = isNaN(parseFloat(item.precio));
+        const subtotal = isNotNumeric ? 'A cotizar' : (item.precio * item.cantidad);
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>
@@ -579,9 +581,9 @@ function openOrderModal(id) {
                     <span>${item.nombre}</span>
                 </div>
             </td>
-            <td>$${parseFloat(item.precio).toLocaleString()}</td>
+            <td>${isNotNumeric ? item.precio : '$' + parseFloat(item.precio).toLocaleString()}</td>
             <td>${item.cantidad}</td>
-            <td><strong>$${subtotal.toLocaleString()}</strong></td>
+            <td><strong>${isNotNumeric ? 'A cotizar' : '$' + subtotal.toLocaleString()}</strong></td>
         `;
         tbody.appendChild(tr);
     });
