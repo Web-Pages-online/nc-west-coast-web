@@ -384,16 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeBtn = document.getElementById('theme-toggle');
     const icon = themeBtn ? themeBtn.querySelector('i') : null;
 
-    // --- MENÚ HAMBURGUESA (MÓVIL) ---
-    const hamburger = document.querySelector('.hamburger');
-    const navMenu = document.querySelector('.nav-menu');
-    
-    if (hamburger && navMenu) {
-        hamburger.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-            hamburger.classList.toggle('active');
-        });
-    }
+    // Se eliminó el manejador redundante del menú hamburguesa porque ya existe arriba.
 
     // Definir globalmente para los onclick de HTML
     window.closeMenu = function() {
