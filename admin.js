@@ -32,6 +32,12 @@ function switchTab(tabId) {
         loadOrders();
     } else if (tabId === 'inventario') {
         loadInventory();
+    } else if (tabId === 'marketing') {
+        if (allProducts.length === 0) {
+            loadInventory().then(() => renderMarketingProducts(allProducts));
+        } else {
+            renderMarketingProducts(allProducts);
+        }
     }
 }
 
@@ -672,3 +678,158 @@ async function bulkMarkAsShipped() {
     loadOrders();
 }
 
+// --- LÓGICA DE MARKETING (COLLAGE) ---
+function renderMarketingProducts(products) {
+    const list = document.getElementById('marketingProductsList');
+    if (!list) return;
+    list.innerHTML = '';
+    
+    products.forEach(p => {
+        const div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.alignItems = 'center';
+        div.style.gap = '10px';
+        div.style.padding = '10px';
+        div.style.borderBottom = '1px solid var(--border-color)';
+        
+        div.innerHTML = `
+            <input type="checkbox" class="marketing-checkbox" value="${p.id}" id="mkt-${p.id}" style="transform: scale(1.2); cursor: pointer;">
+            <label for="mkt-${p.id}" style="display: flex; alignItems: center; gap: 10px; cursor: pointer; flex: 1;">
+                <img src="${p.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;" onerror="this.src='bolso.png'">
+                <div>
+                    <strong>${p.name}</strong><br>
+                    <small style="color: var(--text-muted);">${p.brand || 'Sin marca'}</small>
+                </div>
+            </label>
+        `;
+        list.appendChild(div);
+    });
+}
+
+// Buscador de Marketing
+const marketingSearchInput = document.getElementById('marketingSearchInput');
+if (marketingSearchInput) {
+    marketingSearchInput.addEventListener('input', () => {
+        const term = marketingSearchInput.value.toLowerCase();
+        const filtered = allProducts.filter(p => 
+            (p.name && p.name.toLowerCase().includes(term)) || 
+            (p.brand && p.brand.toLowerCase().includes(term))
+        );
+        renderMarketingProducts(filtered);
+    });
+}
+
+async function generateCollage() {
+    const checkboxes = document.querySelectorAll('.marketing-checkbox:checked');
+    if (checkboxes.length === 0) {
+        showAlert('Selecciona al menos un producto para el collage.');
+        return;
+    }
+    
+    const selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+    const selectedProducts = allProducts.filter(p => selectedIds.includes(p.id));
+    
+    // Configuración del canvas
+    const canvas = document.getElementById('collageCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Determinar cuadrícula (ej. raíz cuadrada redondeada hacia arriba)
+    const count = selectedProducts.length;
+    const cols = Math.ceil(Math.sqrt(count));
+    const rows = Math.ceil(count / cols);
+    
+    const imgSize = 400; // Tamaño de cada imagen en el collage
+    const padding = 20; // Espacio entre imágenes
+    const headerHeight = 100; // Espacio para un título o logo
+    
+    canvas.width = (cols * imgSize) + (padding * (cols + 1));
+    canvas.height = (rows * imgSize) + (padding * (rows + 1)) + headerHeight;
+    
+    // Fondo
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Título opcional
+    ctx.fillStyle = '#1a1a1a';
+    ctx.font = 'bold 40px Outfit, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Nuestros Productos', canvas.width / 2, 60);
+    
+    let loadedCount = 0;
+    
+    // Cargar y dibujar cada imagen
+    for (let i = 0; i < count; i++) {
+        const p = selectedProducts[i];
+        const img = new Image();
+        img.crossOrigin = "Anonymous"; // Para evitar problemas de CORS si las imágenes están en otro dominio
+        
+        img.onload = () => {
+            const col = i % cols;
+            const row = Math.floor(i / cols);
+            
+            const x = padding + (col * (imgSize + padding));
+            const y = headerHeight + padding + (row * (imgSize + padding));
+            
+            // Dibujar fondo de tarjeta
+            ctx.fillStyle = '#fafbfc';
+            ctx.shadowColor = 'rgba(0,0,0,0.1)';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.roundRect(x, y, imgSize, imgSize, 12);
+            ctx.fill();
+            ctx.shadowColor = 'transparent'; // Resetear sombra para la imagen
+            
+            // Dibujar imagen centrada y recortada (object-fit: cover behavior en canvas)
+            const ratio = Math.max(imgSize / img.width, imgSize / img.height);
+            const w = img.width * ratio;
+            const h = img.height * ratio;
+            
+            // Recorte circular o cuadrado
+            ctx.save();
+            ctx.beginPath();
+            ctx.roundRect(x, y, imgSize, imgSize, 12);
+            ctx.clip();
+            ctx.drawImage(img, x + (imgSize - w) / 2, y + (imgSize - h) / 2, w, h);
+            ctx.restore();
+            
+            // Agregar nombre del producto
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillRect(x, y + imgSize - 50, imgSize, 50);
+            
+            ctx.fillStyle = '#1a1a1a';
+            ctx.font = 'bold 20px Outfit, sans-serif';
+            ctx.textAlign = 'center';
+            // Truncar texto si es muy largo
+            let text = p.name;
+            if (text.length > 30) text = text.substring(0, 27) + '...';
+            ctx.fillText(text, x + imgSize / 2, y + imgSize - 20);
+            
+            loadedCount++;
+            if (loadedCount === count) {
+                // Todas las imágenes cargadas
+                canvas.style.display = 'block';
+                const downloadBtn = document.getElementById('downloadCollageBtn');
+                downloadBtn.style.display = 'inline-block';
+                
+                downloadBtn.onclick = () => {
+                    const link = document.createElement('a');
+                    link.download = 'nc-west-coast-collage.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                };
+            }
+        };
+        
+        img.onerror = () => {
+            console.error("Error cargando imagen para collage:", p.image);
+            loadedCount++; // Avanzar incluso si falla para no bloquear
+            if (loadedCount === count) {
+                canvas.style.display = 'block';
+                document.getElementById('downloadCollageBtn').style.display = 'inline-block';
+            }
+        };
+        
+        // Si no hay imagen o hay error anterior, intentar con imagen por defecto
+        img.src = p.image ? p.image : 'bolso.png';
+    }
+}
