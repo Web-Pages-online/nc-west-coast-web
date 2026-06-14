@@ -733,27 +733,43 @@ async function generateCollage() {
     const canvas = document.getElementById('collageCanvas');
     const ctx = canvas.getContext('2d');
     
-    // Determinar cuadrícula (ej. raíz cuadrada redondeada hacia arriba)
+    // Determinar cuadrícula
     const count = selectedProducts.length;
     const cols = Math.ceil(Math.sqrt(count));
     const rows = Math.ceil(count / cols);
     
-    const imgSize = 400; // Tamaño de cada imagen en el collage
-    const padding = 20; // Espacio entre imágenes
-    const headerHeight = 100; // Espacio para un título o logo
+    const imgSize = 400; // Tamaño de la imagen
+    const cardHeight = imgSize + 80; // Alto de la tarjeta (incluye espacio para texto)
+    const padding = 35; // Espacio entre tarjetas
+    const headerHeight = 180; // Espacio para el título principal
+    const footerHeight = 80; // Espacio inferior
     
     canvas.width = (cols * imgSize) + (padding * (cols + 1));
-    canvas.height = (rows * imgSize) + (padding * (rows + 1)) + headerHeight;
+    canvas.height = (rows * cardHeight) + (padding * (rows + 1)) + headerHeight + footerHeight;
     
-    // Fondo
-    ctx.fillStyle = '#ffffff';
+    // 1. Dibujar fondo: Gradiente estético
+    const bgGradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    bgGradient.addColorStop(0, '#f8f9fa');
+    bgGradient.addColorStop(1, '#e2e8f0');
+    ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Título opcional
+    // 2. Título Principal
     ctx.fillStyle = '#1a1a1a';
-    ctx.font = 'bold 40px Outfit, sans-serif';
+    ctx.font = '900 65px Outfit, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Nuestros Productos', canvas.width / 2, 60);
+    ctx.textBaseline = 'middle';
+    ctx.fillText('¡RESTOCK DISPONIBLE!', canvas.width / 2, 70);
+    
+    // 3. Subtítulo
+    ctx.fillStyle = '#bfa37e'; // Color dorado de la marca
+    ctx.font = '600 35px Outfit, sans-serif';
+    ctx.fillText('¡Haz tu pedido ahora mismo por DM o WhatsApp!', canvas.width / 2, 130);
+    
+    // 4. Footer
+    ctx.fillStyle = '#1a1a1a';
+    ctx.font = '500 24px Outfit, sans-serif';
+    ctx.fillText('NC WEST COAST', canvas.width / 2, canvas.height - 40);
     
     let loadedCount = 0;
     
@@ -761,60 +777,74 @@ async function generateCollage() {
     for (let i = 0; i < count; i++) {
         const p = selectedProducts[i];
         const img = new Image();
-        img.crossOrigin = "Anonymous"; // Para evitar problemas de CORS si las imágenes están en otro dominio
+        img.crossOrigin = "Anonymous";
         
         img.onload = () => {
             const col = i % cols;
             const row = Math.floor(i / cols);
             
             const x = padding + (col * (imgSize + padding));
-            const y = headerHeight + padding + (row * (imgSize + padding));
+            const y = headerHeight + padding + (row * (cardHeight + padding));
             
-            // Dibujar fondo de tarjeta
-            ctx.fillStyle = '#fafbfc';
-            ctx.shadowColor = 'rgba(0,0,0,0.1)';
-            ctx.shadowBlur = 10;
+            // a) Tarjeta fondo y sombra
+            ctx.shadowColor = 'rgba(0,0,0,0.15)';
+            ctx.shadowBlur = 25;
+            ctx.shadowOffsetY = 12;
+            ctx.fillStyle = '#ffffff';
             ctx.beginPath();
-            ctx.roundRect(x, y, imgSize, imgSize, 12);
+            ctx.roundRect(x, y, imgSize, cardHeight, 16);
             ctx.fill();
-            ctx.shadowColor = 'transparent'; // Resetear sombra para la imagen
+            ctx.shadowColor = 'transparent'; // Reset sombra
             
-            // Dibujar imagen centrada y recortada (object-fit: cover behavior en canvas)
+            // b) Dibujar imagen (recortada con bordes redondeados arriba)
             const ratio = Math.max(imgSize / img.width, imgSize / img.height);
             const w = img.width * ratio;
             const h = img.height * ratio;
             
-            // Recorte circular o cuadrado
             ctx.save();
             ctx.beginPath();
-            ctx.roundRect(x, y, imgSize, imgSize, 12);
+            ctx.roundRect(x, y, imgSize, imgSize, [16, 16, 0, 0]);
             ctx.clip();
             ctx.drawImage(img, x + (imgSize - w) / 2, y + (imgSize - h) / 2, w, h);
             ctx.restore();
             
-            // Agregar nombre del producto
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-            ctx.fillRect(x, y + imgSize - 50, imgSize, 50);
+            // c) Separador
+            ctx.fillStyle = '#bfa37e';
+            ctx.fillRect(x, y + imgSize, imgSize, 4);
             
+            // d) Textos de producto
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            
+            // Marca
+            ctx.font = '600 16px Outfit, sans-serif';
+            ctx.fillStyle = '#64748b'; // Muted
+            ctx.fillText((p.brand || 'Variedad').toUpperCase(), x + 20, y + imgSize + 15);
+            
+            // Nombre
+            ctx.font = 'bold 22px Outfit, sans-serif';
             ctx.fillStyle = '#1a1a1a';
-            ctx.font = 'bold 20px Outfit, sans-serif';
-            ctx.textAlign = 'center';
-            // Truncar texto si es muy largo
             let text = p.name;
-            if (text.length > 30) text = text.substring(0, 27) + '...';
-            ctx.fillText(text, x + imgSize / 2, y + imgSize - 20);
+            if (text.length > 20) text = text.substring(0, 18) + '...';
+            ctx.fillText(text, x + 20, y + imgSize + 40);
+            
+            // Precio
+            ctx.font = '900 26px Outfit, sans-serif';
+            ctx.fillStyle = '#bfa37e'; // Dorado
+            ctx.textAlign = 'right';
+            ctx.fillText(`$${p.price.toLocaleString()}`, x + imgSize - 20, y + imgSize + 35);
             
             loadedCount++;
             if (loadedCount === count) {
-                // Todas las imágenes cargadas
+                // Terminado
                 canvas.style.display = 'block';
                 const downloadBtn = document.getElementById('downloadCollageBtn');
                 downloadBtn.style.display = 'inline-block';
                 
                 downloadBtn.onclick = () => {
                     const link = document.createElement('a');
-                    link.download = 'nc-west-coast-collage.png';
-                    link.href = canvas.toDataURL('image/png');
+                    link.download = 'nc-west-coast-marketing.png';
+                    link.href = canvas.toDataURL('image/png', 1.0);
                     link.click();
                 };
             }
@@ -822,14 +852,13 @@ async function generateCollage() {
         
         img.onerror = () => {
             console.error("Error cargando imagen para collage:", p.image);
-            loadedCount++; // Avanzar incluso si falla para no bloquear
+            loadedCount++;
             if (loadedCount === count) {
                 canvas.style.display = 'block';
                 document.getElementById('downloadCollageBtn').style.display = 'inline-block';
             }
         };
         
-        // Si no hay imagen o hay error anterior, intentar con imagen por defecto
         img.src = p.image ? p.image : 'bolso.png';
     }
 }
