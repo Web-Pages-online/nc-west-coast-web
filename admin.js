@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api/products';
+const API_URL = '/api/products';
 let allProducts = [];
 
 // Helper para mostrar alertas usando SweetAlert2
@@ -362,7 +362,7 @@ async function handleFileUpload(file, isEdit = false) {
     formData.append('image', file);
 
     try {
-        const res = await fetch('http://localhost:3000/api/upload', {
+        const res = await fetch('/api/upload', {
             method: 'POST',
             body: formData
         });
@@ -398,7 +398,7 @@ window.allOrders = [];
 
 async function loadOrders() {
     try {
-        const res = await fetch('http://localhost:3000/api/orders');
+        const res = await fetch('/api/orders');
         window.allOrders = await res.json();
         populateDateFilters(window.allOrders);
         renderPedidosCards(window.allOrders);
@@ -601,7 +601,7 @@ async function updateOrder(id) {
     const carrier = document.getElementById(`carrier-${id}`).value;
     
     try {
-        const res = await fetch(`http://localhost:3000/api/orders/${id}`, {
+        const res = await fetch(`/api/orders/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status, trackingNumber, carrier })
@@ -657,7 +657,7 @@ async function bulkMarkAsShipped() {
         const carrier = document.getElementById(`carrier-${id}`).value;
         
         try {
-            const res = await fetch(`http://localhost:3000/api/orders/${id}`, {
+            const res = await fetch(`/api/orders/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: 'Enviado', trackingNumber, carrier })
